@@ -6,18 +6,27 @@ receivers:
         endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:4318
+
 exporters:
-  # NOTE: Prior to v0.86.0 use `logging` instead of `debug`.
+  # Debug exporter for local debugging
   debug:
     verbosity: detailed
+  
+  # Elasticsearch APM exporter via OTLP
+  otlphttp/elastic:
+    endpoint: "http://apm-server:8200"
+    headers:
+      # Authorization: Bearer <your-secret-token>  # Uncomment and add your APM secret token if needed
+    compression: gzip
+
 service:
   pipelines:
     traces:
       receivers: [otlp]
-      exporters: [debug]
+      exporters: [debug, otlphttp/elastic]
     metrics:
       receivers: [otlp]
-      exporters: [debug]
+      exporters: [debug, otlphttp/elastic]
     logs:
       receivers: [otlp]
-      exporters: [debug]
+      exporters: [debug, otlphttp/elastic]
